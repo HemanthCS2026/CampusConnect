@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+__pycache__/
+*.py[cod]
+.pytest_cache/
 
 # next.js
 /.next/
@@ -39,3 +42,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+atlas-credentials.env
+/DBMS Level 3 Project Requirements draft.pdf
