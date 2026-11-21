@@ -11,6 +11,7 @@ import { findStudentIdentity } from "@/lib/student-identity";
 import type { StudentIdentity } from "@/lib/student-identity";
 import { parseSkillEntries } from "@/lib/student-skills";
 import { rankTextByTfIdfCosine } from "@/lib/vector-search";
+import { readBoundedRequestBody } from "@/lib/request-body";
 import { isSameOriginRequest } from "@/lib/request-security";
 import {
   buildStudentEmbeddingText,
@@ -21,7 +22,6 @@ import {
   isOpportunityEligible,
   isSemanticEmbedding,
   parseStudentPreferences,
-  readBoundedRequestBody,
   rankSemanticOpportunities,
   SEMANTIC_MODEL_NAME,
   SEMANTIC_MODEL_REVISION,

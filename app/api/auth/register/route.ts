@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
+import { getDatabaseErrorCode } from "@/lib/database-error-code";
+import { validatePersonName, validateUsername } from "@/lib/input-validation";
+import { readBoundedJsonBody } from "@/lib/request-body";
 import { isSameOriginRequest } from "@/lib/request-security";
+
+const MAX_AUTH_REQUEST_BYTES = 16_384;
 
 export async function POST(request: Request) {
   if (!isSameOriginRequest(request)) {
@@ -11,15 +16,19 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
+  const parsedBody = await readBoundedJsonBody(request, MAX_AUTH_REQUEST_BYTES);
+  if (!parsedBody.ok) {
+    const tooLarge = parsedBody.reason === "too-large";
     return NextResponse.json(
-      { message: "Request body must be valid JSON." },
-      { status: 400 }
+      {
+        message: tooLarge
+          ? "Request body is too large."
+          : "Request body must be valid JSON.",
+      },
+      { status: tooLarge ? 413 : 400 }
     );
   }
+  const body = parsedBody.value;
 
   if (typeof body !== "object" || body === null || Array.isArray(body)) {
     return NextResponse.json(
@@ -38,16 +47,17 @@ export async function POST(request: Request) {
     gpa,
     graduationYear,
   } = body as Record<string, unknown>;
-  if (
-    typeof username !== "string" ||
-    username.trim().length < 3 ||
-    typeof password !== "string" ||
-    password.length < 8
-  ) {
+  const normalizedUsername = validateUsername(username);
+  if (!normalizedUsername.ok) {
+    return NextResponse.json(
+      { message: normalizedUsername.message },
+      { status: 400 }
+    );
+  }
+  if (typeof password !== "string" || password.length < 8) {
     return NextResponse.json(
       {
-        message:
-          "Username must have 3+ characters and password 8+ characters.",
+        message: "Password must contain at least 8 characters.",
       },
       { status: 400 }
     );
@@ -59,16 +69,28 @@ export async function POST(request: Request) {
     );
   }
 
+  const normalizedFirstName = validatePersonName(firstName);
+  const normalizedLastName = validatePersonName(lastName);
+  if (!normalizedFirstName.ok || !normalizedLastName.ok) {
+    return NextResponse.json(
+      {
+        message:
+          "First and last names must each contain 1 to 50 characters after trimming.",
+      },
+      { status: 400 }
+    );
+  }
+
   if (
-    typeof firstName !== "string" ||
-    typeof lastName !== "string" ||
     !Number.isInteger(deptId) ||
     (deptId as number) <= 0 ||
+    (deptId as number) > 2_147_483_647 ||
     typeof gpa !== "number" ||
     gpa < 0 ||
     gpa > 10 ||
     !Number.isInteger(graduationYear) ||
-    (graduationYear as number) < 2000
+    (graduationYear as number) < 2000 ||
+    (graduationYear as number) > 2_147_483_647
   ) {
     return NextResponse.json(
       {
@@ -89,7 +111,7 @@ export async function POST(request: Request) {
         `INSERT INTO users (username, password_hash, role)
          VALUES ($1, $2, $3)
          RETURNING user_id, username, role`,
-        [username.trim(), passwordHash, role]
+        [normalizedUsername.value, passwordHash, role]
       );
       await client.query(
         `INSERT INTO students
@@ -98,8 +120,8 @@ export async function POST(request: Request) {
         [
           result.rows[0].user_id,
           deptId,
-          firstName.trim(),
-          lastName.trim(),
+          normalizedFirstName.value,
+          normalizedLastName.value,
           gpa,
           graduationYear,
         ]
@@ -117,17 +139,22 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "23505"
+      getDatabaseErrorCode(error) === "23505"
     ) {
       return NextResponse.json(
         { message: "Username is already registered." },
         { status: 409 }
       );
     }
-    console.error("Registration failed.");
+    if (getDatabaseErrorCode(error) === "23503") {
+      return NextResponse.json(
+        { message: "The selected department is invalid." },
+        { status: 400 }
+      );
+    }
+    console.error("Registration failed.", {
+      sqlState: getDatabaseErrorCode(error),
+    });
     return NextResponse.json(
       { success: false, message: "Registration failed." },
       { status: 500 }

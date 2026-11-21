@@ -5,7 +5,10 @@ import type { AuthUser } from "@/lib/auth";
 import { getStudentSkillProfilesCollection } from "@/lib/mongodb";
 import { findStudentIdentity } from "@/lib/student-identity";
 import { parseSkillEntries } from "@/lib/student-skills";
+import { readBoundedJsonBody } from "@/lib/request-body";
 import { isSameOriginRequest } from "@/lib/request-security";
+
+const MAX_SKILL_PROFILE_REQUEST_BYTES = 32_768;
 
 function getStudentUser(request: Request):
   | { user: AuthUser }
@@ -98,15 +101,23 @@ export async function PUT(request: Request) {
     );
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
+  const parsedBody = await readBoundedJsonBody(
+    request,
+    MAX_SKILL_PROFILE_REQUEST_BYTES
+  );
+  if (!parsedBody.ok) {
+    const tooLarge = parsedBody.reason === "too-large";
     return NextResponse.json(
-      { success: false, message: "Request body must be valid JSON." },
-      { status: 400 }
+      {
+        success: false,
+        message: tooLarge
+          ? "Request body is too large."
+          : "Request body must be valid JSON.",
+      },
+      { status: tooLarge ? 413 : 400 }
     );
   }
+  const body = parsedBody.value;
 
   if (!isRecord(body) || Object.keys(body).some((key) => key !== "skills")) {
     return NextResponse.json(

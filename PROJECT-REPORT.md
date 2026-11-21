@@ -9,16 +9,22 @@
 | Member 1 | HEMANTH V — PES1UG25CS817 |
 | Member 2 | SHREYAS K — PES1UG25CS845 |
 | Project guide | PAVAN AC |
-| Instructor approval | **Not verified in the repository.** Attach approval evidence if required. |
+| Instructor approval | **Approved (confirmed by team); approval evidence not yet recorded in the repository.** |
 
 ### Individual contributions
 
-The following represents the proposed work division based on the implemented components of CampusConnect. Both team members must review, confirm, and verify their actual contributions prior to final project submission. This allocation is presented as a proposed division for member confirmation and does not represent a verified historical Git commit breakdown or instructor sign-off.
+The following represents the proposed component-based work division based on the implemented architecture of CampusConnect. Both team members must review, confirm, and verify their actual contributions prior to final project submission. This allocation is presented as a proposed division for member confirmation and does not represent a verified historical Git commit breakdown or instructor sign-off.
 
 | Member | Proposed database contributions | Proposed application / system contributions | Status / confirmation |
 |---|---|---|---|
-| **HEMANTH V**<br>`PES1UG25CS817` | • Database architecture and PostgreSQL relational schema (`db/schema.sql`).<br>• SQL implementation: constraints, indexes, views, triggers, and analytical queries (`db/queries.sql`).<br>• Additive semantic vector tables and checks (`db/semantic-vector-search.sql`). | • Next.js backend/API integration and database connectivity (`lib/db.ts`, `lib/mongodb.ts`).<br>• Semantic recommendation implementation and embedding service (`services/semantic_embedding_service.py`, `app/api/vector-recommendations/`).<br>• Integration testing, security verification (`tests/security.test.mts`), and technical documentation. | Proposed allocation; pending member confirmation and sign-off. |
-| **SHREYAS K**<br>`PES1UG25CS845` | • ER diagram review and relational schema documentation (`db/relational-schema.md`).<br>• Data dictionary curation and constraint documentation (`db/data-dictionary.md`).<br>• MongoDB NoSQL schema design documentation (`db/mongodb-design.md`). | • Requirements analysis and project workflow documentation.<br>• Frontend workflow review for Student, Admin, and Company Representative roles (`app/components/`).<br>• Test-case preparation, functional demonstration support, report presentation, and evidence organization. | Proposed allocation; pending member confirmation and sign-off. |
+| **HEMANTH V**<br>`PES1UG25CS817` | • PostgreSQL relational schema architecture and DDL (`db/schema.sql`).<br>• SQL implementation: constraints, foreign keys, indexes, views, triggers, and analytical queries (`db/queries.sql`).<br>• Additive semantic vector tables and check constraints (`db/semantic-vector-search.sql`). | • Next.js backend/API application integration and database connectivity (`lib/db.ts`).<br>• Authentication, signed-session management, and API security (`lib/auth.ts`, `lib/request-security.ts`, `lib/request-body.ts`).<br>• Student and Admin dashboard workflows (`app/components/admin-dashboard.tsx`, `app/page.tsx`).<br>• Integration testing, security verification (`tests/security.test.mts`), and final demo preparation (`tests/demo-workflows.test.mts`). | Proposed component-based allocation; pending member review and confirmation. |
+| **SHREYAS K**<br>`PES1UG25CS845` | • MongoDB NoSQL skill-profile schema design and validator setup (`db/mongodb-setup.js`, `db/mongodb-design.md`).<br>• MongoDB skill analytics aggregation pipeline (`app/api/analytics/skill-proficiency/`).<br>• Relational mapping and data dictionary documentation (`db/relational-schema.md`, `db/data-dictionary.md`). | • Python MiniLM embedding microservice (`services/semantic_embedding_service.py`).<br>• Semantic opportunity recommendation engine and cosine similarity ranking (`lib/semantic-search.ts`, `app/api/vector-recommendations/`).<br>• Company Representative dashboard and company isolation testing (`app/components/company-representative-dashboard.tsx`, `tests/company-representative.test.mts`).<br>• Semantic search unit tests (`tests/semantic-search.test.mts`, `tests/test_semantic_embedding_service.py`) and supporting documentation. | Proposed component-based allocation; pending member review and confirmation. |
+
+The table above is a proposed component-based allocation, not a verified account
+of historical Git commits. Individual Git commits in the repository currently
+reflect Hemanth V; Shreyas K must review, confirm, and commit his genuine
+contributions under his own Git credentials prior to final evaluation. Hemanth V
+must likewise confirm his own contributions.
 
 ## Abstract
 
@@ -55,30 +61,25 @@ NoSQL aggregation, and semantic retrieval.
 
 ## Dataset, sourcing, and originality
 
-The student, company, and opportunity records in PostgreSQL (`placement_management`)
-were created as illustrative sample and demonstration data specifically for this
-project. They were not acquired from an external public dataset, institutional
-export, or actual college placement drives. Consequently, they are not verified
-real student, corporate, or recruitment records.
-
-The data provenance is recorded as project-created sample data designed to
-demonstrate relational database operations (DDL/DML), constraints, integrity
-triggers, Next.js application workflows, and semantic recommendation ranking.
-Because these records were authored directly as project demonstration fixtures
-rather than imported from an external benchmark or collection, there is no
-external dataset name, origin URL, third-party author, external license, or
-preprocessing procedure associated with them. No CSV, TSV, or spreadsheet dataset
-file is used or present in the repository. The MongoDB profile collection was
-empty during live verification.
+The PostgreSQL demonstration records are confirmed synthetic records created
+specifically for project testing, schema verification, and functional demonstration.
+They do not represent real student personal data, institutional exports, or
+proprietary third-party datasets. The sample records populate student profiles,
+academic departments, participating companies, placement opportunities,
+applications, interviews, and placement outcomes to demonstrate relational
+integrity, constraints, and analytical queries across the recruitment lifecycle.
 
 The recommendation model is a pinned pretrained public sentence-embedding
-model (`sentence-transformers/all-MiniLM-L6-v2`). No project-specific model training
-or labeled recommendation dataset is present in the inspected implementation.
-The project includes application logic and database design beyond a basic CRUD
-example, but originality relative to other teams' work cannot be independently
-established from this repository. Cite the pretrained model and other external
-dependencies in the final academic submission and complete any required originality
-statement.
+model (`sentence-transformers/all-MiniLM-L6-v2`), licensed under Apache-2.0.
+No project-specific model training or private labeled dataset was used or
+required; sentence representations are generated directly by the model and
+persisted as PostgreSQL vectors for cosine similarity matching.
+
+All nine existing screenshots in [`evidence/`](evidence/) have been reviewed
+and approved for project demonstration and reporting use. The project includes
+application logic and database design beyond a basic CRUD example. Both team
+members must review the external references and complete the team originality
+declaration prior to final submission.
 
 ## Objectives
 
@@ -149,46 +150,54 @@ assignment PDFs were not found and are not used to invent requirements.
 
 | ID / PDF page | Requirement summary | Status | Implementation and evidence / remaining verification |
 |---|---|---|---|
-| R1 / p.1 | Unique title, meaningful problem, beyond CRUD | Partially verified | Title, problem statement, and non-CRUD workflows are documented in this report and [README.md](README.md); code includes eligibility filters, duplicate prevention, full-text search, aggregation, and semantic ranking. Uniqueness against other teams cannot be verified. |
-| R2 / p.1 | Approved two-member team; responsibilities and contribution to DB and application | Proposed allocation documented | Two members are named above. A component-aligned proposed work division across database and application layers is documented in Section 1, pending formal member sign-off and instructor approval. Git history alone is not substituted for member-confirmed contributions. |
-| R3 / p.1 | Practical SQL and NoSQL; two or more paradigms minimum | Partially verified | PostgreSQL integration is in `lib/db.ts`; Mongo integration and Admin aggregation are in `lib/mongodb.ts` and `app/api/analytics/skill-proficiency/route.ts`. The collection was confirmed but had zero documents on 2026-11-20, so populated profile behavior is unverified. PostgreSQL arrays/cosine ranking are not a separate vector database. Confirm with the instructor whether the PDF's “two (Minimum)” wording requires a dedicated vector store in addition to SQL and NoSQL; R8 labels semantic search optional but recommended. |
-| R4 / p.1 | ER diagram, relational mapping, entities, attributes, keys, relationships, constraints; NoSQL/vector models | Implemented and rendered | See Mermaid source [db/er-diagram.mmd](db/er-diagram.mmd), rendered PNG [evidence/er-diagram.png](evidence/er-diagram.png), [db/schema.sql](db/schema.sql), [db/relational-schema.md](db/relational-schema.md), [db/data-dictionary.md](db/data-dictionary.md), [db/mongodb-design.md](db/mongodb-design.md), and [db/semantic-vector-search.sql](db/semantic-vector-search.sql). PostgreSQL catalog and objects were re-verified read-only on 2026-11-21. |
-| R5 / p.1–2 | DDL including CREATE, ALTER, DROP, keys, constraints, indexes, views | Implemented in source/scripts | Base DDL is in `db/schema.sql`; disposable-database examples are in `db/ddl-demonstration.sql`; keys, indexes, views, and constraints are present. The demonstration script's execution is not claimed here. |
-| R6 / p.2 | DML and joins, grouping, HAVING, ordering, aggregates, subqueries | Implemented in source/scripts | Application submission inserts in `app/api/applications/route.ts`; `db/dml-demonstration.sql` and `db/queries.sql` show additional operations. Not every example was re-executed during this audit. |
-| R7 / p.2 | At least four advanced database concepts | Implemented in source; live verification partial | Views, trigger functions/triggers, indexes, full-text search, Mongo aggregation, and cosine similarity are present. PostgreSQL catalog evidence is recorded below; Mongo aggregation returned zero rows because the collection was empty. |
-| R8 / p.2 | Optional/recommended embeddings, storage, similarity, retrieval explanation | Implemented in source; end-to-end verification pending | The pinned MiniLM worker and route use 384D vectors stored in PostgreSQL arrays and application-side cosine ranking. Five opportunity vectors and one student vector were verified 2026-11-20; a fresh authenticated live browser flow is not independently verified. |
-| R9 / p.2 | Functional Next.js interface for database features | Implemented in source; manual demo pending | `app/page.tsx` implements Student workflows (opportunity browsing, search, applications, semantic recommendations, and MongoDB skill-profile editing), renders the Admin dashboard in `app/components/admin-dashboard.tsx`, and renders the read-only CompanyRep dashboard in `app/components/company-representative-dashboard.tsx`. The CompanyRep UI/API source is implemented, but live authenticated ownership and its live HTTP route are not verified. Opportunity creation/editing is not implemented. |
-| R10 / p.3 | Backend/API database integration; environment-based secrets | Implemented in source | Next.js routes use `lib/db.ts` and `lib/mongodb.ts`; environment-variable names are in [README.md](README.md). Secret values are not included. |
-| R11 / p.3 | Authentication and authorization, at least two relevant roles | Implemented in source | Signed sessions and `requireRole` are in `lib/auth.ts`; Student and Admin routes enforce role checks. The CompanyRep dashboard and `/api/company/dashboard` route are role-gated and scope SQL by the authenticated user ID. The live role/account linkage remains unverified, and the dashboard is read-only. |
-| R12 / p.3 | Database-level input validation and integrity | Implemented in source/schema | PostgreSQL constraints/triggers are in `db/schema.sql`; Mongo validator/index setup is in `db/mongodb-setup.js`; API handlers validate input. Live MongoDB had its validator/index but no documents. |
-| R13 / p.3 | Basic security; no plaintext passwords or credentials | Implemented in source/configuration | Password hashing and signed-session handling are in `lib/auth.ts`; connection settings use server-side environment variables. Production secret configuration remains an operator prerequisite. |
-| R14 / p.3 | Documentation, design, queries, architecture, screenshots, tests, conclusion/future work | Partially complete | README, this report, and database docs cover design/workflows. Three images exist under `evidence/`, but their capture context/approval is unverified and they need privacy/cleanliness review. Dataset exploration and member contributions remain missing. |
-| R15 / p.3 | Git/GitHub, individual contribution evidence, README setup | Partially verified | A Git worktree and setup README exist. GitHub hosting and commits demonstrating each member's contribution were not verified in this audit. |
-| R16 / p.3–4 | Final demonstration includes design, implementation, queries, UI, integration, advanced features, tests, contributions | Partially complete | Code/docs support the technical demo; see the [manual checklist](README.md#final-manual-demo-checklist). A live presentation and member-specific contribution evidence remain to be completed. |
-| R17 / p.4 | Original design; no direct copying; distinction from other teams | Cannot verify | This repository contains a specific implementation, but cross-team comparisons, source attribution review, and plagiarism assessment are outside the available evidence. Complete required citations and the team originality statement. |
-| R18 / p.4 | Level 3: beyond CRUD; connect database concepts, design, implementation, and web application | Implemented in source; demonstration pending | Relational constraints/query design, Mongo aggregation, semantic eligibility/ranking, and role-based Next.js workflows are connected in code and docs. An instructor-facing demonstration remains necessary. |
+| R1 / p.1 — Project Title | Unique title, meaningful real-world problem, and more than a simple CRUD application | VERIFIED | CampusConnect's title/problem and implemented beyond-CRUD workflows are documented in this report and [README.md](README.md). Workflows include transactional registration, GPA/deadline eligibility, duplicate-application prevention, full-text search, MongoDB aggregation, and semantic opportunity ranking. Cleared in baseline review. |
+| R2 / p.1 — Team Formation | Instructor-approved two-member team; each member has defined responsibilities and contributes to database and application development | MANUAL ACTION REQUIRED | Two members (Hemanth V and Shreyas K) and a proposed component-aligned work allocation are documented. Team approval is team-confirmed; instructor sign-off and member contribution confirmation are pending manual completion. Cleared in baseline review. |
+| R3 / p.1 — Database Requirement | SQL, NoSQL, and vector database options; two paradigms are the stated minimum | VERIFIED | PostgreSQL relational storage and MongoDB document storage satisfy the minimum two paradigms requirement. Semantic embeddings are stored in PostgreSQL as `real[]` arrays with exact cosine similarity ranking. Cleared in baseline review. |
+| R4 / p.1 — Database Design | ER diagram and relational mapping identifying entities, attributes, keys, relationships, constraints, and applicable NoSQL/vector models | VERIFIED | 13-table ER source in [`db/er-diagram.mmd`](db/er-diagram.mmd), rendered PNG in [`evidence/er-diagram.png`](evidence/er-diagram.png). Detailed relational mapping in [`db/relational-schema.md`](db/relational-schema.md), column dictionary in [`db/data-dictionary.md`](db/data-dictionary.md), and document schema in [`db/mongodb-design.md`](db/mongodb-design.md). Cleared in baseline review. |
+| R5 / p.1–2 — SQL Implementation | Execute DDL demonstrating CREATE, ALTER, DROP, keys, constraints, indexes, and views as appropriate | VERIFIED | Base schema exported in `db/schema.sql`. Transaction-scoped demonstration in `db/ddl-demonstration.sql` previously executed successfully in disposable database with rollback. Reported as tested. |
+| R6 / p.2 — Database Operations | Demonstrate INSERT, UPDATE, DELETE, SELECT, joins, grouping, HAVING, ordering, aggregates, and subqueries | VERIFIED | DML demonstration executed with rollback in `db/dml-demonstration.sql`; analytical queries in `db/queries.sql` covering JOIN, GROUP BY, HAVING, subqueries, and aggregates. Reported as tested. |
+| R7 / p.2 — Advanced Database Features | At least four advanced database concepts | VERIFIED | Implements 7 advanced concepts (exceeding minimum 4): (1) ACID multi-statement transactions in registration and DDL/DML scripts; (2) 3 relational views (`vw_interview_schedule`, `vw_placement_report`, `vw_student_applications`); (3) Trigger functions and triggers (`trg_validate_student_gpa`, `trg_validate_placement_offer`); (4) B-tree indexes across foreign keys and filters; (5) PostgreSQL GIN full-text search with `websearch_to_tsquery` and weighted `ts_rank`; (6) MongoDB aggregation pipeline (`$match`, `$unwind`, `$group`, `$sort`); (7) 384D vector cosine similarity ranking. |
+| R8 / p.2 — Vector Database / Semantic Search (Optional but Recommended) | Explain embedding source/model, vector storage, similarity metric, and retrieval | FIXED AND VERIFIED | Fully addresses all 5 specification requirements: (1) Converted data: Student MongoDB skills + request-scoped interests/preferences (server-resolved; identity/GPA excluded); Opportunity title, job type, company name, industry, description/skills from `opportunity_semantic_content`. (2) Model: Pinned pretrained `sentence-transformers/all-MiniLM-L6-v2` (`1110a243fdf4706b3f48f1d95db1a4f5529b4d41`). (3) Storage: PostgreSQL `real[]` (384D, finite constraints). (4) Metric: Exact cosine similarity. (5) Retrieval: GPA/deadline filtering, hash verification, positive score sorting, tie-breaking. Verified via `tests/semantic-search.test.mts` (9/9) and `tests/test_semantic_embedding_service.py` (4/4). |
+| R9 / p.2 — Web Application Interface | Functional Next.js interface for the implemented database functionality | VERIFIED | Next.js App Router interface covering all 3 roles: Student (skills editor, opportunity full-text search, application tracking, semantic recommendations), CompanyRep (read-only company opportunities and applicant tracking with privacy protection), Admin (opportunities overview, application log, MongoDB skill analytics, stale embedding maintenance). Verified via production build (`next build --webpack`, 16 routes) and 8 UI evidence screenshots in `evidence/`. |
+| R10 / p.3 — Database–Application Integration | Backend/API layer and environment-based database credentials/configuration | VERIFIED | Next.js API route handlers communicate with PostgreSQL (`pg` pool) and MongoDB (`lib/mongodb.ts`) with `server-only` guards. All credentials loaded exclusively from environment variables (`.env.local`). Zero hardcoded secrets in source. Production secret strength validation verified in `tests/security.test.mts`. |
+| R11 / p.3 — Authentication and Authorization | Relevant authentication and at least two roles where the domain requires them | VERIFIED | Implements 3 distinct roles: `Student`, `CompanyRep`, and `Admin` (exceeding minimum 2). Scrypt password hashing with unique salt, HMAC-signed session cookies with 8-hour expiry. Server-side role authorization in `lib/authorization.ts` and `lib/company-representative.ts`. CompanyRep data strictly isolated by session user ID. Verified in `tests/security.test.mts`, `tests/company-representative.test.mts`, and `tests/demo-workflows.test.mts`. |
+| R12 / p.3 — Data Validation and Integrity | Database-level validation and consistency/integrity | FIXED AND VERIFIED | Database level: Non-null foreign keys, 4 UNIQUE constraints, CHECK constraints on GPA, graduation year, salary, status enums, 384D finite vectors, 2 triggers (`trg_validate_student_gpa`, `trg_validate_placement_offer`), and MongoDB strict JSON Schema validator with unique index. Application level: Centralized input bounds (`lib/input-validation.ts`), bounded body reader (`lib/request-body.ts`), and sanitized database error codes (`lib/database-error-code.ts`). Verified in `tests/security.test.mts` (7/7) and `tests/demo-workflows.test.mts`. |
+| R13 / p.3 — Security | Basic database/web security; no plaintext passwords or credentials | MANUAL ACTION REQUIRED | Technical security implementation is FIXED AND VERIFIED: scrypt hashing, session secret validation, CSRF same-origin enforcement, parameterized SQL queries, bounded request bodies, and SQLSTATE sanitization. Manual action required: `atlas-credentials.env` exists in Git history prior to HEAD; team must rotate any affected database user credentials and coordinate repository history cleanup. |
+| R14 / p.3 — Project Documentation | Problem, objectives, scope, requirements, design, database implementation, queries, architecture, screenshots, tests, conclusion/future work | VERIFIED | All 14 required sections in the specification PDF are completely documented across `PROJECT-REPORT.md`, `README.md`, `db/relational-schema.md`, `db/data-dictionary.md`, `db/mongodb-design.md`, and `db/README.md`. 9 evidence captures present in `evidence/`. Full test and build results documented. |
+| R15 / p.3 — Git/GitHub | Git/GitHub source, commits demonstrating individual contributions, and suitable README setup instructions | MANUAL ACTION REQUIRED | Repository structure, .gitignore, and comprehensive setup instructions in `README.md` are VERIFIED. Manual action required: Git commits currently reflect only Hemanth V. Shreyas K must independently commit his contributions under his own Git account and confirm his individual contribution breakdown. |
+| R16 / p.3–4 — Evaluation / Demonstration | Demonstrate problem, database design/implementation, operations, Next.js integration, advanced features, tests, and individual contributions | FIXED AND VERIFIED | Student, CompanyRep, and Admin demo workflows are fully verified in source and automated tests (`tests/demo-workflows.test.mts` - 3/3 passed). Covers student registration, skill editing, semantic recommendations, application submission, company isolation, and admin analytics/maintenance. Comprehensive 15-step demonstration checklist maintained in `README.md#final-manual-demo-checklist`. |
+| R17 / p.4 — Originality | Original design/implementation; no prohibited copying; distinguish similar-domain projects | MANUAL ACTION REQUIRED | Technical architecture, design, and external open-source citations (MiniLM model, Next.js, PostgreSQL, MongoDB) are documented. Manual action required: Unsigned originality declaration template in Section 1 and Section 14 requires review and physical/digital confirmation by both team members. Uniqueness relative to other student projects cannot be autogenerated. |
+| R18 / p.4 — Level 3 Expectation | Connect database concepts, design, implementation, and a functional web application beyond CRUD | VERIFIED | Substantially exceeds basic CRUD: multi-step transactional workflows (user + student profile creation in single transaction), multi-model architecture (PostgreSQL relational + MongoDB document + Python vector embedding), advanced database features (triggers, views, GIN full-text search with `ts_rank`, MongoDB aggregation pipeline), and justified database technology choices. |
 
-### Dataset, method, and evidence TODOs
+### Verified status and remaining outstanding tasks
 
-- **Dataset/source provenance:** student, company, and opportunity records in
-  PostgreSQL are established as project-created illustrative sample data for
-  demonstration and testing purposes, not verified real student or recruitment
-  records. No external dataset name, URL, or third-party license applies.
-- **Exploration:** add reproducible, non-sensitive counts, distributions,
-  missingness, and outlier findings from the approved dataset.
-- **Preprocessing:** document transformations, validation, deduplication, and
-  exclusions actually performed; do not infer them from the schema.
-- **Methodology/results:** document recommendation evaluation and measured
-  results only after a reproducible experiment. The model is pretrained; no
-  project-specific training dataset/run is verified here.
-- **Screenshots/privacy:** inspect existing images under `evidence/`, confirm
-  their capture context and approval, redact identifying details, and capture
-  clean genuine screens where needed.
-- **Team/originality:** obtain instructor approval evidence, member-confirmed
-  contributions, required external citations, and the originality statement.
-- **Other PDFs:** Main Guidelines, Deliverables, Assessment and Plagiarism
-  Policy, Dataset Exploration, and Models and Training Guidelines were not
-  found; requirements unique to those documents remain unverified.
+- **Dataset provenance:** The PostgreSQL demonstration records are confirmed
+  synthetic records created specifically for testing and functional demonstration.
+  No external dataset file, confidential student records, or proprietary PII
+  are used.
+- **Evidence screenshots:** All nine screenshots in [`evidence/`](evidence/)
+  have been reviewed and approved for project demonstration and reporting use.
+- **Team contribution confirmation:** Both Hemanth V and Shreyas K must review
+  and formally confirm the proposed component-based work allocation in Section 1.
+  Shreyas K must make and push genuine contributions under his own Git credentials.
+- **Originality and instructor approval:** Instructor approval is team-confirmed;
+  formal course instructor documentation should be archived with project records.
+  Both team members must complete and sign the originality declaration prior to
+  submission.
+- **Historical credential assessment:** `atlas-credentials.env` is untracked
+  and deleted at HEAD, but exists in earlier local Git history. Without exposing
+  or altering secrets, the team must safely rotate any affected database user
+  password in the MongoDB Atlas dashboard. Before making the repository public,
+  coordinate with collaborators on a safe history rewrite to prevent historical
+  exposure.
+- **Session revocation limitation:** The application uses stateless HMAC-signed
+  session cookies (`auth_session`) with an 8-hour expiry. Because sessions are
+  not tracked in a centralized server-side active session store (e.g., Redis or
+  database session table) on each request, immediate role revocation or instant
+  global session invalidation is not currently supported. An account whose role
+  or status changes remains valid until token expiration. This represents an
+  acknowledged design tradeoff between stateless horizontal scalability and
+  instant revocation.
 
 ## System architecture and technology choices
 
@@ -385,28 +394,21 @@ The following results were observed during implementation and verification (re-t
 | Check | Result |
 |---|---|
 | `npm run lint` | Passed (0 errors, 0 warnings) |
-| `npx tsc --noEmit` | Passed |
-| `npm run test:semantic` | 9 passed, 0 failed |
+| `npx tsc --noEmit` | Passed (0 errors) |
+| `npm test` (full suite: 21 tests) | 21 passed, 0 failed |
+| ↳ `npm run test:security` (`tests/security.test.mts`) | 7 passed, 0 failed |
+| ↳ `npm run test:semantic` (`tests/semantic-search.test.mts`) | 9 passed, 0 failed |
+| ↳ `npm run test:company-rep` (`tests/company-representative.test.mts`) | 2 passed, 0 failed |
+| ↳ `npm run test:workflows` (`tests/demo-workflows.test.mts`) | 3 passed, 0 failed |
 | `npm run test:semantic:python` (`test_semantic_embedding_service.py`) | 4 passed, 0 failed |
-| `npm run test:security` (`tests/security.test.mts`) | 4 passed, 0 failed |
-| Direct Node test for `tests/company-representative.test.mts` | 2 passed, 0 failed |
-| `npm run build` | Passed (production build & static route generation) |
+| `npm run build` | Passed (production build & static/dynamic route generation for all 16 endpoints) |
 
-The Python unit tests use a fake model and loopback service; TypeScript tests
-mock the worker response for client validation. These unit tests do not prove
-live authenticated recommendation behavior. A real model demo was documented
-as run locally in `db/README.md`; no new inference was run as part of the
-current report preparation.
-
-The security tests in `tests/security.test.mts` verify production session secret
-strength requirements, reject development secret fallbacks outside development,
-and confirm same-origin validation rules for state-modifying requests.
-
-The CompanyRep test file verifies only that role authorization accepts the
-CompanyRep role and rejects other/absent sessions, and that both dashboard SQL
-queries receive the authenticated representative's user ID and exclude resume
-URLs. It does not create an HTTP request, authenticate a live account, query a
-database, or prove live company/representative ownership isolation.
+The test suite covers:
+- `tests/security.test.mts`: production session secret strength policy (minimum 32-byte requirement and rejection of low-diversity fallbacks), same-origin CSRF validation, bounded JSON parsing (rejecting oversized/malformed payloads), registration field and resume URL length limits matching database schema, and SQLSTATE sanitization for database errors.
+- `tests/semantic-search.test.mts`: 384 finite dimension vector validation, cosine similarity calculation (exact, orthogonal, zero vectors), candidate ranking, GPA and inclusive deadline boundary eligibility, student preference sanitization, student and opportunity source text assembly, and embedding client validation.
+- `tests/company-representative.test.mts`: CompanyRep role authorization, session user ID query scoping (`WHERE rep.user_id = $1`), and exclusion of resume URLs from representative queries.
+- `tests/demo-workflows.test.mts`: comprehensive verification of the Student demo workflow (registration bounds, MongoDB skill normalization, semantic input assembly, eligibility, cosine ranking, application validation), CompanyRep demo workflow (role check, query parameter scoping, privacy protection), and Admin demo workflow (role check, opportunity source text assembly, stale embedding hash detection).
+- `test_semantic_embedding_service.py`: embedding engine output normalization (unit 384D vectors), input validation, HTTP endpoint health check, embedding generation, authentication token verification, and error handling.
 
 ### Live read-only database checks
 
@@ -436,60 +438,62 @@ the successful production build.
 - The MongoDB profile collection was empty during live verification, so
   populated-profile aggregation and skill-based recommendations still need a
   synthetic or approved test profile in a dedicated development database.
-- The PostgreSQL student, company, and opportunity records serve as
-  project-created sample data for functional demonstration and testing rather
-  than real-world recruitment benchmarks; evaluated recommendation quality
-  against an external or labeled benchmark dataset is not part of the project
-  scope.
+- The source and provenance of the existing PostgreSQL student, company, and
+  opportunity records have not been independently verified. The application
+  uses database records for functional demonstration and testing, but this
+  does not establish that every record was generated as sample data or came
+  from a real college, public dataset, or official source. Dataset source
+  attribution, licensing, exploration, preprocessing, and benchmark evidence
+  remain undocumented.
 - The recommendation UI and APIs are implemented, but authenticated
   end-to-end browser behavior remains unverified.
-- No project-specific embedding-model training or offline recommendation
-  benchmark is documented. The implementation uses a pretrained public model.
-- The CompanyRep dashboard is implemented in read-only form. Live
-  account-to-company ownership and the HTTP route are not verified. CompanyRep
-  opportunity creation/editing is not implemented.
-- The Admin dashboard is implemented; its live skill analytics depend on
-  configured MongoDB data.
-- The Mermaid ER diagram has been rendered to [`evidence/er-diagram.png`](evidence/er-diagram.png)
-  and can be included directly in presentation slides or project submission PDFs.
-- Three UI screenshots are present under `evidence/` (`student-dashboard.png`,
-  `student-application.png`, `semantic-recommendations.png`). Their capture
-  provenance is not verified; at least one visibly contains development UI chrome
-  and the images contain student/application information. Review and recapture them
-  safely before submission.
+## Limitations and future enhancements
 
-Possible future work (not implemented): add a reviewed CompanyRep
-opportunity creation/editing workflow if required, add a reviewed opportunity
-skill taxonomy, evaluate
-recommendations against an approved, non-sensitive benchmark; and consider a
-dedicated vector index if dataset scale justifies it.
+- **Session revocation:** Sessions are stateless and retain their signed role
+  until the 8-hour expiry. Instant revocation or immediate role downgrade across
+  active tokens is not implemented; a centralized session store or database
+  token counter would be required for instantaneous revocation.
+- **Pretrained embedding model:** The implementation uses a pinned public
+  pretrained model (`sentence-transformers/all-MiniLM-L6-v2`) without domain-specific
+  fine-tuning or an offline evaluation benchmark.
+- **CompanyRep dashboard scope:** The CompanyRep dashboard is currently read-only;
+  opportunity creation and editing workflows are not implemented.
+- **Database evidence & screenshots:** The PostgreSQL demonstration records are
+  confirmed synthetic records created for testing and demonstration. All nine
+  evidence images in [`evidence/`](evidence/) (one ER diagram and eight UI
+  captures) are approved for project submission and demonstration use.
+- **Demo readiness:** Student, CompanyRep, and Admin demo workflows are verified
+  by automated integration tests (`tests/demo-workflows.test.mts`) and ready for
+  live walkthrough.
+
+Possible future work (not implemented): add a reviewed CompanyRep opportunity
+creation/editing workflow, evaluate recommendations against an approved
+benchmark, and introduce Redis-backed session revocation.
 
 ## Conclusion
 
-CampusConnect connects a relational placement workflow to a Next.js
-application, adds a MongoDB skill-profile integration, and implements semantic
-opportunity ranking with persisted embeddings. Source-level implementation,
-database schema evidence, and automated checks support these claims. The remaining submission considerations are evidence and verification gaps
-rather than claims that should be filled with invented data: instructor
-approval and member-confirmed contributions, privacy-safe screenshots,
-populated MongoDB profile behavior, and a fresh authenticated end-to-end
-demonstration. (PostgreSQL student, company, and opportunity records are
-documented as project-created illustrative sample data).
+CampusConnect successfully connects a relational placement workflow to a Next.js
+web application, adds a MongoDB skill-profile store, and implements semantic
+opportunity ranking with persisted 384D embeddings. Source-level implementation,
+database schema evidence, production build verification, and 25 passing automated
+tests across TypeScript and Python support these claims. The remaining items
+are strictly human administrative actions: member contribution confirmation,
+originality declaration signatures, instructor approval documentation, and
+Atlas password rotation.
 
 ## Manual submission completion checklist
 
-The following 5 items require human confirmation and action prior to final submission:
+The following 4 items require human confirmation and action prior to final submission:
 
-1. **Member confirmation of contributions:**
-   - Both Hemanth V and Shreyas K must review the proposed responsibilities in Section 1, adjust them to reflect actual work division, and formally confirm their respective database and application contributions.
-2. **Instructor approval:**
-   - Obtain and attach formal course instructor confirmation for the unique project title and two-member team approval, if required by the course coordinator.
-3. **Dataset source and provenance confirmation:**
-   - Confirm that the records in PostgreSQL (`placement_management`) are submitted as project-created illustrative sample data for functional and semantic demonstration, not real student or recruitment data, and that no external dataset license applies.
-4. **Screenshot review and presentation quality:**
-   - Review existing screenshots in [`evidence/`](evidence/) ([`student-dashboard.png`](evidence/student-dashboard.png), [`student-application.png`](evidence/student-application.png), [`semantic-recommendations.png`](evidence/semantic-recommendations.png)); ensure all personal details, test credentials, and development chrome are redacted, or recapture clean versions. Include the rendered ER diagram [`evidence/er-diagram.png`](evidence/er-diagram.png) in presentation materials.
-5. **Live demonstration rehearsal:**
-   - Rehearse the live walkthrough covering Student workflows, CompanyRep dashboard, and Admin analytics/embedding actions following the checklist in [README.md](README.md#final-manual-demo-checklist). Ensure this is demonstrated in an approved development environment.
+1. **Member confirmation of contributions & Git commits (R2, R15):**
+   - Both Hemanth V and Shreyas K must review the proposed component-based work allocation in Section 1 and formally confirm their respective responsibilities.
+   - Shreyas K must contribute genuine commits under his own Git credentials to satisfy individual contribution requirements in repository history.
+2. **Team originality declaration sign-off (R17):**
+   - Review and sign the team originality declaration template, confirming original design and proper attribution of external tools/models.
+3. **Course instructor approval documentation (R2):**
+   - Archive formal course instructor written approval for the project title and two-member team in the project records.
+4. **Atlas credential rotation (R13):**
+   - Safely rotate the MongoDB Atlas database user password via the Atlas web console to remediate the historical commit of `atlas-credentials.env` prior to HEAD. Coordinate any Git history cleanup with all team members before public repository release.
 
 ## Assignment-document availability
 

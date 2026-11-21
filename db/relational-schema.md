@@ -148,6 +148,43 @@ column default or column-specific key/check is declared.
 | `joining_date` | `date` | NULL | — | — |
 | `status` | `character varying(20)` | NOT NULL | `'Pending Joining'::character varying` | CHECK `placements_status_check` |
 
+### `public.opportunity_semantic_content`
+
+**Primary key:** `opportunity_semantic_content_pkey (opp_id)`
+
+| Column | PostgreSQL type | Nullability | Default | Key or column constraint |
+|---|---|---|---|---|
+| `opp_id` | `integer` | NOT NULL | — | PRIMARY KEY; FOREIGN KEY to `public.opportunities(opp_id) ON DELETE CASCADE` |
+| `description` | `text` | NULL | — | — |
+| `required_skills` | `text[]` | NOT NULL | `ARRAY[]::text[]` | CHECK `opportunity_semantic_content_skills_limit` (`cardinality <= 100`) |
+| `updated_at` | `timestamp with time zone` | NOT NULL | `CURRENT_TIMESTAMP` | — |
+
+### `public.opportunity_semantic_embeddings`
+
+**Primary key:** `opportunity_semantic_embeddings_pkey (opp_id)`
+
+| Column | PostgreSQL type | Nullability | Default | Key or column constraint |
+|---|---|---|---|---|
+| `opp_id` | `integer` | NOT NULL | — | PRIMARY KEY; FOREIGN KEY to `public.opportunities(opp_id) ON DELETE CASCADE` |
+| `model_name` | `text` | NOT NULL | — | CHECK (`model_name = 'sentence-transformers/all-MiniLM-L6-v2'`) |
+| `model_revision` | `text` | NOT NULL | — | CHECK (`model_revision = '1110a243fdf4706b3f48f1d95db1a4f5529b4d41'`) |
+| `source_hash` | `text` | NOT NULL | — | CHECK (length 64, hex string `^[0-9a-f]{64}$`) |
+| `embedding` | `real[]` | NOT NULL | — | CHECK `opportunity_semantic_embeddings_dimensions` (1D, 384D); CHECK `opportunity_semantic_embeddings_finite` |
+| `generated_at` | `timestamp with time zone` | NOT NULL | `CURRENT_TIMESTAMP` | — |
+
+### `public.student_semantic_embeddings`
+
+**Primary key:** `student_semantic_embeddings_pkey (student_id)`
+
+| Column | PostgreSQL type | Nullability | Default | Key or column constraint |
+|---|---|---|---|---|
+| `student_id` | `integer` | NOT NULL | — | PRIMARY KEY; FOREIGN KEY to `public.students(student_id) ON DELETE CASCADE` |
+| `model_name` | `text` | NOT NULL | — | CHECK (`model_name = 'sentence-transformers/all-MiniLM-L6-v2'`) |
+| `model_revision` | `text` | NOT NULL | — | CHECK (`model_revision = '1110a243fdf4706b3f48f1d95db1a4f5529b4d41'`) |
+| `source_hash` | `text` | NOT NULL | — | CHECK (length 64, hex string `^[0-9a-f]{64}$`) |
+| `embedding` | `real[]` | NOT NULL | — | CHECK `student_semantic_embeddings_dimensions` (1D, 384D); CHECK `student_semantic_embeddings_finite` |
+| `generated_at` | `timestamp with time zone` | NOT NULL | `CURRENT_TIMESTAMP` | — |
+
 ## Foreign keys and relationships
 
 For each relationship, the child-side foreign key is NOT NULL, so each child
@@ -166,6 +203,9 @@ constraint requires a child to exist.
 | `interviews_app_id_fkey` | `interviews.app_id` | `applications.app_id` | Each interview has exactly one application; each application has zero or many interviews. |
 | `offers_app_id_fkey` | `offers.app_id` | `applications.app_id` | Each offer has exactly one application; each application has zero or one offer because `offers.app_id` is UNIQUE. |
 | `placements_offer_id_fkey` | `placements.offer_id` | `offers.offer_id` | Each placement has exactly one offer; each offer has zero or one placement because `placements.offer_id` is UNIQUE. |
+| `opportunity_semantic_content_pkey` (FK) | `opportunity_semantic_content.opp_id` | `opportunities.opp_id` | Each opportunity has zero or one semantic content row; cascades on delete. |
+| `opportunity_semantic_embeddings_pkey` (FK) | `opportunity_semantic_embeddings.opp_id` | `opportunities.opp_id` | Each opportunity has zero or one embedding row; cascades on delete. |
+| `student_semantic_embeddings_pkey` (FK) | `student_semantic_embeddings.student_id` | `students.student_id` | Each student has zero or one cached embedding row; cascades on delete. |
 
 `students` and `opportunities` have a many-to-many association through
 `applications`. The composite UNIQUE constraint limits each student/opportunity
@@ -188,6 +228,9 @@ opportunity to have an application.
 | `interviews_pkey` | `interviews(interview_id)` |
 | `offers_pkey` | `offers(offer_id)` |
 | `placements_pkey` | `placements(placement_id)` |
+| `opportunity_semantic_content_pkey` | `opportunity_semantic_content(opp_id)` |
+| `opportunity_semantic_embeddings_pkey` | `opportunity_semantic_embeddings(opp_id)` |
+| `student_semantic_embeddings_pkey` | `student_semantic_embeddings(student_id)` |
 
 ### UNIQUE constraints
 
@@ -217,6 +260,17 @@ opportunity to have an application.
 | `offers_amount_check` | `offers.amount >= 0`. |
 | `offers_status_check` | `offers.status` is `Pending`, `Accepted`, or `Rejected`. |
 | `placements_status_check` | `placements.status` is `Pending Joining`, `Joined`, or `Withdrawn`. |
+| `opportunity_semantic_content_skills_limit` | `opportunity_semantic_content.required_skills` cardinality $\le$ 100. |
+| `opportunity_semantic_embeddings_model_check` | Pinned model `sentence-transformers/all-MiniLM-L6-v2`. |
+| `opportunity_semantic_embeddings_revision_check` | Pinned revision `1110a243fdf4706b3f48f1d95db1a4f5529b4d41`. |
+| `opportunity_semantic_embeddings_hash_check` | 64-character hexadecimal SHA-256 string. |
+| `opportunity_semantic_embeddings_dimensions` | Exactly 384 dimensions (`cardinality = 384` and `array_ndims = 1`). |
+| `opportunity_semantic_embeddings_finite` | Vector contains no NULL, NaN, Infinity, or -Infinity elements. |
+| `student_semantic_embeddings_model_check` | Pinned model `sentence-transformers/all-MiniLM-L6-v2`. |
+| `student_semantic_embeddings_revision_check` | Pinned revision `1110a243fdf4706b3f48f1d95db1a4f5529b4d41`. |
+| `student_semantic_embeddings_hash_check` | 64-character hexadecimal SHA-256 string. |
+| `student_semantic_embeddings_dimensions` | Exactly 384 dimensions (`cardinality = 384` and `array_ndims = 1`). |
+| `student_semantic_embeddings_finite` | Vector contains no NULL, NaN, Infinity, or -Infinity elements. |
 
 ## Cardinality and schema limitations
 

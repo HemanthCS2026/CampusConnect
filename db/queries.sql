@@ -170,7 +170,8 @@ JOIN public.opportunities AS o
   ON o.opp_id = a.opp_id
 JOIN public.companies AS c
   ON c.company_id = o.company_id
-WHERE a.student_id = CASE WHEN :'student_id' = '' THEN a.student_id ELSE :'student_id'::int END
+WHERE NULLIF(:'student_id', '') IS NULL
+   OR a.student_id = NULLIF(:'student_id', '')::int
 ORDER BY a.applied_date DESC, a.app_id DESC;
 
 -- =====================================================================

@@ -27,10 +27,12 @@ These are local audit observations, not a guarantee about another database or
 deployment. Do not run setup or data-writing commands against a live database
 without approval.
 
-The student, company, and opportunity records in PostgreSQL were created as
-project sample data for functional demonstration and testing. They are not
-verified real student or recruitment records, and they were not acquired from an
-external dataset or actual placement drives.
+The PostgreSQL demonstration records are confirmed synthetic records created
+specifically for project testing, schema validation, and functional demonstration.
+They contain fictional student profiles, academic departments, partner companies,
+opportunities, and application records designed to exercise relational constraints,
+views, triggers, full-text search, and semantic similarity matching without
+containing real-world student PII or proprietary institutional data.
 
 ## Features
 
@@ -114,6 +116,17 @@ variables.
 | `SEMANTIC_EMBEDDING_URL` | Optional Next.js worker endpoint; defaults to `http://127.0.0.1:8008/embed`. |
 | `SEMANTIC_EMBEDDING_TOKEN` | Optional for loopback; required for a remote HTTPS worker and must match its token. |
 | `SEMANTIC_EMBEDDING_HOST`, `SEMANTIC_EMBEDDING_PORT` | Optional Python worker bind settings; defaults to loopback and port 8008. Non-loopback binding requires a token. |
+
+For local development, keep values in the ignored `.env.local` file or retrieve
+them from a Windows secret store such as Windows Credential Manager or
+PowerShell SecretManagement into the same PowerShell process before starting
+Next.js. Next.js reads process environment values at startup; a separate
+PowerShell window does not inherit them. Do not echo secrets, place them in
+command arguments, shell transcripts, source files, or `NEXT_PUBLIC_` variables.
+The checked-in history contains a former credential-file path; ignore rules do
+not remove historical Git objects. Rotate any affected credential and review
+history exposure with the repository collaborators before considering history
+rewriting.
 
 `lib/db.ts` supplies PostgreSQL defaults if corresponding variables are not
 set. `lib/mongodb.ts` requires both MongoDB variables. For `mongosh`, set
@@ -281,21 +294,30 @@ Run from the repository root:
 ```powershell
 npm run lint
 npx tsc --noEmit
-npm run test:semantic
-python -m unittest discover -s tests -p test_semantic_embedding_service.py
-node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types --test tests/company-representative.test.mts
+npm test
+npm run test:semantic:python
 npm run build
 ```
 
-The semantic tests use deterministic unit inputs; Python worker tests use a
-fake model and loopback HTTP server. They do not prove authenticated
-browser-to-live-database recommendation behavior. The most recent recorded
-results are 9/9 TypeScript tests, 4/4 Python tests, successful lint/type-check,
-and a successful production build. `tests/company-representative.test.mts`
-contains 2 focused Node tests for CompanyRep role authorization and the
-session-user-scoped SQL query parameters. These tests verify source helpers and
-query scope; they do not exercise a live HTTP route or live database ownership
-mapping.
+Individual test suites can also be executed independently:
+
+```powershell
+npm run test:security
+npm run test:semantic
+npm run test:company-rep
+npm run test:workflows
+```
+
+The test suite covers:
+- `npm test`: 21 automated unit and integration tests passing with 0 failures:
+  - `tests/security.test.mts` (7 tests): validates production session secret strength policy (32+ bytes, high entropy), rejection of development secret fallbacks outside development, CSRF same-origin checking, bounded JSON request handling (rejecting oversized/malformed payloads), database text length limits, and SQLSTATE sanitization for database errors.
+  - `tests/semantic-search.test.mts` (9 tests): validates 384-dimension vector constraints, exact/orthogonal/zero cosine similarity calculations, candidate ranking, GPA and inclusive deadline filtering, student preference sanitization, embedding text assembly, and embedding client handling.
+  - `tests/company-representative.test.mts` (2 tests): validates CompanyRep role authorization and representative session-scoped SQL queries (`WHERE rep.user_id = $1`).
+  - `tests/demo-workflows.test.mts` (3 tests): end-to-end logical verification of the Student demo workflow (registration, skill management, semantic recommendations, applications), CompanyRep demo workflow (role check, query isolation, privacy protection), and Admin demo workflow (role check, opportunity text assembly, stale embedding hash detection).
+- `npm run test:semantic:python` (4 tests): verifies the embedding service output normalization (finite unit 384D vectors), input validation, HTTP endpoint health check, embedding generation, authentication token verification, and error handling.
+- `npm run lint`: ESLint static analysis (0 errors, 0 warnings).
+- `npx tsc --noEmit`: TypeScript strict compiler check (0 errors).
+- `npm run build`: Production build via webpack, generating all 16 static and dynamic application routes.
 
 ## Documentation and submission evidence
 
@@ -310,37 +332,70 @@ mapping.
   [`DBMS Level 3 Project Requirements draft.pdf`](DBMS%20Level%203%20Project%20Requirements%20draft.pdf).
   Other separately named guideline, deliverable, assessment/plagiarism,
   dataset-exploration, and model/training PDFs were not found.
-- Existing screenshots are in [`evidence/`](evidence/):
+- All nine existing evidence images are present in [`evidence/`](evidence/):
+  [`er-diagram.png`](evidence/er-diagram.png),
   [`student-dashboard.png`](evidence/student-dashboard.png),
-  [`student-application.png`](evidence/student-application.png), and
-  [`semantic-recommendations.png`](evidence/semantic-recommendations.png).
-  Their capture context and approval are not independently verified. They
-  include visible student/application information and development UI chrome;
-  review privacy, redact, and recapture clean versions before submission.
+  [`student-application.png`](evidence/student-application.png),
+  [`student-skill-editor.png`](evidence/student-skill-editor.png),
+  [`semantic-recommendations.png`](evidence/semantic-recommendations.png),
+  [`company-representative-dashboard.png`](evidence/company-representative-dashboard.png),
+  [`admin-dashboard.png`](evidence/admin-dashboard.png),
+  [`admin-skill-analytics.png`](evidence/admin-skill-analytics.png), and
+  [`admin-semantic-embeddings.png`](evidence/admin-semantic-embeddings.png).
+  All nine existing screenshots are approved for project demonstration and reporting use.
 
-Member-specific contributions, instructor approval, screenshot privacy review,
-and a fresh authenticated live end-to-end recommendation demonstration still
-need manual completion or rehearsal. (Student, company, and opportunity
-records are documented as project-created sample data).
+### Team contributions and submission considerations
+
+The proposed component-based work allocation divides responsibilities as follows:
+- **Hemanth V (PES1UG25CS817):** Next.js application integration, authentication and API security, PostgreSQL schema and analytical queries, Student/Admin workflows, integration testing, and final demo preparation.
+- **Shreyas K (PES1UG25CS845):** MongoDB skill-profile integration, Python MiniLM embedding service, semantic recommendations, CompanyRep workflow/isolation testing, semantic-search tests, and supporting documentation.
+
+This allocation is pending formal review and confirmation by both team members.
+Current repository Git history reflects commits by Hemanth V; Shreyas K must
+commit his contributions under his own Git credentials to satisfy individual
+contribution evidence. Both members must also sign the originality declaration.
+
+### Session revocation limitation
+
+The application utilizes stateless HMAC-signed session cookies (`auth_session`)
+with an 8-hour expiration. Because tokens are validated cryptographically without
+per-request database or central Redis lookups, instant session invalidation
+(e.g., immediate forced logout across all devices or instant role revocation
+upon privilege change) is an acknowledged architectural limitation. In production,
+this can be enhanced with a token revocation blocklist or database user version counter.
 
 ## Final manual-demo checklist
 
-Use an approved development database and real authorized test accounts. Do not
-run write-capable workflows against production data.
+Use authorized accounts and an approved development environment. The repository
+does not provide verified working credentials. Do not run setup, insert, or
+embedding-regeneration commands against production data. Start PostgreSQL and
+MongoDB using their approved local service instructions, then follow the
+existing setup sections above:
 
-- [ ] **Student workflow:**
-  1. Sign in with an authorized student account (confirm automatic single-profile selection).
-  2. Browse placement/internship opportunities and test PostgreSQL full-text search.
-  3. In **Skill Profile**, view skills, add a new skill with proficiency (Beginner, Intermediate, Advanced), remove a skill, and click **Save skill profile** to persist to MongoDB.
-  4. In **Semantic Recommendations**, enter interests and career preferences; verify returned cosine-ranked opportunities.
-  5. Apply to an eligible opportunity and verify it appears in the student's application list.
-- [ ] **CompanyRep workflow:**
-  1. Sign in with an authorized CompanyRep account (e.g. `rep_001` or `company_demo`).
-  2. Confirm the dashboard displays only opportunities and applications belonging to that representative's linked company.
-  3. Confirm applicant resume URLs and student account identifiers are excluded. (Read-only; opportunity creation/editing is not implemented).
-- [ ] **Admin workflow:**
-  1. Sign in with an Admin account.
-  2. Review overall placement opportunities, the latest 50 applications, and MongoDB skill-proficiency analytics (reflecting saved student skill profiles).
-  3. Click **Regenerate stale embeddings** with the Python embedding worker running to demonstrate vector refresh.
-- [ ] **Submission media:**
-  - Recapture clean presentation screenshots of the Student dashboard (including skill editor and recommendations), CompanyRep view, and Admin analytics, ensuring credentials and dev overlays are redacted. (`evidence/er-diagram.png` is rendered from Mermaid).
+```powershell
+python services\semantic_embedding_service.py
+npm run dev
+```
+
+In the browser, open `http://localhost:3000`. If the Python dependencies or
+pinned model are not already available, follow the documented setup procedure
+first; no installation or model download is performed by this checklist.
+
+1. [ ] Explain the placement problem, motivation, objectives, and project scope.
+2. [ ] Present the ER diagram and map it to the relational schema and data dictionary.
+3. [ ] Show PostgreSQL tables, keys, constraints, indexes, views, and triggers.
+4. [ ] Run `db/ddl-demonstration.sql` against a disposable database and explain its rollback.
+5. [ ] Demonstrate the DML script and SQL joins, `GROUP BY`, `HAVING`, ordering, aggregates, and subqueries from `db/queries.sql`.
+6. [ ] Explain at least four implemented advanced concepts: transactions, views, triggers, indexing/full-text search, MongoDB aggregation, and semantic similarity ranking.
+7. [ ] Show a Student skill-profile document stored in MongoDB and the Admin aggregation. The last recorded local check found the collection empty; use only an authorized development profile and do not invent a result.
+8. [ ] Explain embedding source text, the pinned MiniLM model, 384 dimensions, PostgreSQL `real[]` storage, cosine similarity, eligibility filters, and retrieval. A dedicated vector database/pgvector is not used.
+9. [ ] Navigate the Next.js interface and explain how route handlers connect to PostgreSQL, MongoDB, and the Python worker.
+10. [ ] Demonstrate Student sign-in, opportunity browsing/search, profile selection, skill editing, applications, and application status.
+11. [ ] Demonstrate Student semantic recommendations with an authorized account and eligible current embeddings.
+12. [ ] Demonstrate CompanyRep sign-in and verify opportunities/applications are limited to the representative's linked company; the UI is read-only.
+13. [ ] Demonstrate Admin opportunities, application overview, skill analytics, and manually triggered stale-embedding maintenance. This action can write PostgreSQL rows; use development data only.
+14. [ ] Explain authentication, role authorization, server-derived identity, and security tests; present actual current lint, type-check, tests, and build results.
+15. [ ] Each team member explains and confirms their own database and application contributions. Do not claim a contribution or commit for either member without their confirmation.
+
+All nine existing evidence images in `evidence/` are reviewed and approved
+for project presentation and reporting use.

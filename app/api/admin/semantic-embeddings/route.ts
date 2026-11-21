@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import { getSessionUser, requireRole } from "@/lib/auth";
 import { isSameOriginRequest } from "@/lib/request-security";
+import { readBoundedRequestBody } from "@/lib/request-body";
 import {
   buildOpportunityEmbeddingText,
   generateSemanticEmbeddings,
   hashEmbeddingSource,
-  readBoundedRequestBody,
   SEMANTIC_MODEL_NAME,
   SEMANTIC_MODEL_REVISION,
   type OpportunitySemanticSource,

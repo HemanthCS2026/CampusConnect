@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readBoundedRequestBody } from "../lib/request-body.ts";
 import {
   buildOpportunityEmbeddingText,
   buildStudentEmbeddingText,
@@ -13,7 +14,6 @@ import {
   rankSemanticOpportunities,
   SEMANTIC_MODEL_NAME,
   SEMANTIC_MODEL_REVISION,
-  readBoundedRequestBody,
   SEMANTIC_VECTOR_DIMENSIONS,
   type SemanticOpportunity,
 } from "../lib/semantic-search.ts";

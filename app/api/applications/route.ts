@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
+import { getDatabaseErrorCode } from "@/lib/database-error-code";
 import { getSessionUser, requireRole } from "@/lib/auth";
 import type { AuthUser } from "@/lib/auth";
+import { isValidResumeUrl } from "@/lib/input-validation";
+import { readBoundedJsonBody } from "@/lib/request-body";
 import { isSameOriginRequest } from "@/lib/request-security";
+
+const MAX_APPLICATION_REQUEST_BYTES = 8_192;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -14,15 +19,6 @@ function isPositiveInteger(value: unknown): value is number {
     Number.isInteger(value) &&
     value > 0 &&
     value <= 2_147_483_647
-  );
-}
-
-function hasDatabaseCode(error: unknown, code: string): boolean {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === code
   );
 }
 
@@ -98,7 +94,9 @@ export async function GET(request: Request) {
       applications: result.rows,
     });
   } catch (error) {
-    console.error("Failed to fetch applications:", error);
+    console.error("Failed to fetch applications.", {
+      sqlState: getDatabaseErrorCode(error),
+    });
     return NextResponse.json(
       { success: false, message: "Failed to fetch applications." },
       { status: 500 }
@@ -117,16 +115,22 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: unknown;
-
-  try {
-    body = await request.json();
-  } catch {
+  const parsedBody = await readBoundedJsonBody(
+    request,
+    MAX_APPLICATION_REQUEST_BYTES
+  );
+  if (!parsedBody.ok) {
+    const tooLarge = parsedBody.reason === "too-large";
     return NextResponse.json(
-      { message: "Request body must be valid JSON." },
-      { status: 400 }
+      {
+        message: tooLarge
+          ? "Request body is too large."
+          : "Request body must be valid JSON.",
+      },
+      { status: tooLarge ? 413 : 400 }
     );
   }
+  const body = parsedBody.value;
 
   if (!isRecord(body)) {
     return NextResponse.json(
@@ -147,13 +151,9 @@ export async function POST(request: Request) {
     );
   }
 
-  if (
-    resume_url !== undefined &&
-    resume_url !== null &&
-    typeof resume_url !== "string"
-  ) {
+  if (!isValidResumeUrl(resume_url)) {
     return NextResponse.json(
-      { message: "resume_url must be a string or null." },
+      { message: "resume_url must be null or a string of at most 255 characters." },
       { status: 400 }
     );
   }
@@ -186,21 +186,23 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    if (hasDatabaseCode(error, "23505")) {
+    if (getDatabaseErrorCode(error) === "23505") {
       return NextResponse.json(
         { message: "You have already applied to this opportunity." },
         { status: 409 }
       );
     }
 
-    if (hasDatabaseCode(error, "23503")) {
+    if (getDatabaseErrorCode(error) === "23503") {
       return NextResponse.json(
         { message: "The selected student or opportunity does not exist." },
         { status: 400 }
       );
     }
 
-    console.error("Failed to create application:", error);
+    console.error("Failed to create application.", {
+      sqlState: getDatabaseErrorCode(error),
+    });
     return NextResponse.json(
       { message: "Failed to submit application." },
       { status: 500 }

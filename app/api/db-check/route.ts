@@ -1,5 +1,6 @@
 ﻿import { NextResponse } from "next/server";
 import pool from "@/lib/db";
+import { getDatabaseErrorCode } from "@/lib/database-error-code";
 
 export async function GET() {
   try {
@@ -10,7 +11,9 @@ export async function GET() {
       message: "Database connection is healthy.",
     });
   } catch (error) {
-    console.error("Database health check failed:", error);
+    console.error("Database health check failed.", {
+      sqlState: getDatabaseErrorCode(error),
+    });
 
     return NextResponse.json(
       {

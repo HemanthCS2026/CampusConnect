@@ -5,7 +5,11 @@ import {
   SESSION_COOKIE,
   verifyPassword,
 } from "@/lib/auth";
+import { getDatabaseErrorCode } from "@/lib/database-error-code";
+import { readBoundedJsonBody } from "@/lib/request-body";
 import { isSameOriginRequest } from "@/lib/request-security";
+
+const MAX_AUTH_REQUEST_BYTES = 16_384;
 
 export async function POST(request: Request) {
   if (!isSameOriginRequest(request)) {
@@ -15,15 +19,19 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
+  const parsedBody = await readBoundedJsonBody(request, MAX_AUTH_REQUEST_BYTES);
+  if (!parsedBody.ok) {
+    const tooLarge = parsedBody.reason === "too-large";
     return NextResponse.json(
-      { message: "Request body must be valid JSON." },
-      { status: 400 }
+      {
+        message: tooLarge
+          ? "Request body is too large."
+          : "Request body must be valid JSON.",
+      },
+      { status: tooLarge ? 413 : 400 }
     );
   }
+  const body = parsedBody.value;
 
   if (typeof body !== "object" || body === null || Array.isArray(body)) {
     return NextResponse.json(
@@ -73,8 +81,10 @@ export async function POST(request: Request) {
       }
     );
     return response;
-  } catch {
-    console.error("Login failed.");
+  } catch (error) {
+    console.error("Login failed.", {
+      sqlState: getDatabaseErrorCode(error),
+    });
     return NextResponse.json(
       { success: false, message: "Login failed." },
       { status: 500 }

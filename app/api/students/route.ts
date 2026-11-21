@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
+import { getDatabaseErrorCode } from "@/lib/database-error-code";
 import { getSessionUser, requireRole } from "@/lib/auth";
 import type { AuthUser } from "@/lib/auth";
 
@@ -34,7 +35,9 @@ export async function GET(request: Request) {
       students: result.rows,
     });
   } catch (error) {
-    console.error("Failed to fetch students:", error);
+    console.error("Failed to fetch students.", {
+      sqlState: getDatabaseErrorCode(error),
+    });
 
     return NextResponse.json(
       {

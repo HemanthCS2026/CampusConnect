@@ -76,7 +76,7 @@ documentation, not an existing record:
 | `skills[].name` | String | Required, 1-80 characters after normalization. Normalize with Unicode NFC, trim leading/trailing whitespace, collapse internal whitespace, and apply locale-independent lowercase. Preserve punctuation (`c++`, `c#`, `.net`). Reject blank names and control characters. |
 | `skills[].proficiency` | String | Required enum: `beginner`, `intermediate`, `advanced`, or `expert`. Reject other values. The current local cosine ranker uses skill-name text; proficiency does not change eligibility or score. |
 | `createdAt` | BSON `Date` | Required UTC creation timestamp, set by the server on first insert and not changed on updates. |
-| `updatedAt` | BSON `Date` | Required UTC timestamp, set by the server on insert and refreshed on each successful profile write. Must not precede `createdAt`. |
+| `updatedAt` | BSON `Date` | Required UTC timestamp, set by the server on insert and refreshed on each successful profile write. The application write path intends it not to precede `createdAt`; the MongoDB validator checks that both values are dates but does not enforce their relative order for direct database writes. |
 | `schemaVersion` | Int32 | Required positive integer. Initial value is `1`; increment only with a documented migration when the document shape changes. |
 
 The setup script's collection validator requires these fields, BSON types,
