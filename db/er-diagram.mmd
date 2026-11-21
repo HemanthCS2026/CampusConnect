@@ -1,0 +1,128 @@
+erDiagram
+    USERS ||--o| STUDENTS : "student profile"
+    USERS ||--o| COMPANY_REPS : "representative profile"
+    DEPARTMENTS ||--o{ STUDENTS : "classifies"
+    COMPANIES ||--o{ COMPANY_REPS : "has representatives"
+    COMPANIES ||--o{ OPPORTUNITIES : "offers"
+    STUDENTS ||--o{ APPLICATIONS : "submits"
+    OPPORTUNITIES ||--o{ APPLICATIONS : "receives"
+    APPLICATIONS ||--o{ INTERVIEWS : "has"
+    APPLICATIONS ||--o| OFFERS : "may receive"
+    OFFERS ||--o| PLACEMENTS : "may result in"
+    OPPORTUNITIES ||--o| OPPORTUNITY_SEMANTIC_CONTENT : "semantic content"
+    OPPORTUNITIES ||--o| OPPORTUNITY_SEMANTIC_EMBEDDINGS : "semantic vector"
+    STUDENTS ||--o| STUDENT_SEMANTIC_EMBEDDINGS : "semantic vector"
+
+    USERS {
+        int user_id PK
+        varchar(50) username UK
+        varchar(255) password_hash
+        varchar(20) role
+    }
+
+    STUDENTS {
+        int student_id PK
+        int user_id FK, UK
+        int dept_id FK
+        varchar(50) first_name
+        varchar(50) last_name
+        numeric(4,2) gpa
+        int graduation_year
+    }
+
+    DEPARTMENTS {
+        int dept_id PK
+        varchar(100) dept_name UK
+    }
+
+    COMPANIES {
+        int company_id PK
+        varchar(100) company_name UK
+        varchar(100) industry
+    }
+
+    COMPANY_REPS {
+        int rep_id PK
+        int company_id FK
+        int user_id FK, UK
+        varchar(100) name
+    }
+
+    OPPORTUNITIES {
+        int opp_id PK
+        int company_id FK
+        varchar(100) title
+        varchar(20) type
+        numeric(12,2) salary
+        date deadline
+        numeric(4,2) min_gpa
+    }
+
+    APPLICATIONS {
+        int app_id PK
+        int student_id FK
+        int opp_id FK
+        date applied_date
+        varchar(20) status
+        varchar(255) resume_url
+    }
+
+    INTERVIEWS {
+        int interview_id PK
+        int app_id FK
+        timestamp_without_time_zone interview_date
+        varchar(50) type
+        varchar(20) status
+        text feedback
+    }
+
+    OFFERS {
+        int offer_id PK
+        int app_id FK, UK
+        date offer_date
+        numeric(12,2) amount
+        varchar(20) status
+    }
+
+    PLACEMENTS {
+        int placement_id PK
+        int offer_id FK, UK
+        date joining_date
+        varchar(20) status
+    }
+
+    OPPORTUNITY_SEMANTIC_CONTENT {
+        int opp_id PK, FK
+        text description
+        text_array required_skills
+        timestamp_with_time_zone updated_at
+    }
+
+    OPPORTUNITY_SEMANTIC_EMBEDDINGS {
+        int opp_id PK, FK
+        text model_name
+        text model_revision
+        text source_hash
+        real_array embedding
+        timestamp_with_time_zone generated_at
+    }
+
+    STUDENT_SEMANTIC_EMBEDDINGS {
+        int student_id PK, FK
+        text model_name
+        text model_revision
+        text source_hash
+        real_array embedding
+        timestamp_with_time_zone generated_at
+    }
+
+%% PostgreSQL type notes: int is integer; varchar(n) is character varying(n);
+%% timestamp_without_time_zone represents timestamp without time zone.
+%% timestamp_with_time_zone represents timestamp with time zone (timestamptz).
+%% text_array is text[]; real_array is real[].
+%% Uppercase entity labels map to the same-named lowercase public table identifiers.
+%% Mermaid cannot express a composite UNIQUE constraint: applications(student_id, opp_id).
+%% The UK markers show single-column UNIQUE constraints. UNIQUE user_id in students
+%% and company_reps, UNIQUE app_id in offers, and UNIQUE offer_id in placements
+%% make those parent-to-child relationships zero-or-one on the child side.
+%% Semantic storage tables have zero-or-one parent-to-child relationships with CASCADE deletion.
